@@ -157,5 +157,4 @@ function Cheovim_load_user_init()
 	end
 
 	log.info('Loaded ' .. cheovim_profile_name .. ' profile')
-	return
 end
