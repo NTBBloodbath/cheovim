@@ -73,6 +73,10 @@ Cheovim profiles are configured in `~/.nvim_profiles.lua`.
 If a profile is not provided by a `~/.nvim_profile` file, then the `default`
 profile is used.
 
+> **IMPORTANT:** Every time you change the configuration, you must run `PackerSync`
+> _if you use packer_ to update the plugins and move them since not all setups or
+> distributions have the same configuration in their plugins or the same plugins.
+
 ### .nvim_profiles.lua
 
 This file contains a Lua table, with the keys being the profile names and the values
@@ -122,8 +126,8 @@ If this file doesn't exist, then `default` profile will be used, as before.
 
 ## Todo
 
-- [ ] Check if the current profile was changed.
-- [ ] Stop deleting and creating again the symlinks if the profile haven't changed.
+- [x] Check if the current profile was changed.
+- [x] Stop deleting and creating again the symlinks if the profile haven't changed.
 - [ ] Add a command to use inside Neovim to switch profiles (not live reload, or maybe yes?)
 
 ## License
