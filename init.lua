@@ -13,9 +13,9 @@
 --       \__\/       \__\/       \__\/         ~~~~               \__\/       --
 --                                                                            --
 --                                                                            --
---                      chnvim - Neovim profile switcher                      --
+--                     cheovim - Neovim profile switcher                      --
 ---]]----------------------------------------------------------------------[[---
 
-require('chnvim')
+require('cheovim')
 
-Chnvim_load_user_init()
+Cheovim_load_user_init()
