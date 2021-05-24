@@ -152,7 +152,6 @@ local function cheovim_load_config_files()
 		local prev_config_file =
 			utils.readlink(nvim_config_path .. '/' .. config_file, false)
 
-        print(config_file)
 		if
 			prev_config_file
 			and not prev_config_file:find(current_profile.name, 1, true)
