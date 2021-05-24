@@ -1,4 +1,4 @@
-local log = require('chnvim.utils.log')
+local log = require('cheovim.utils.log')
 
 local M = {}
 
@@ -21,7 +21,7 @@ M.expand_home = function(path)
 end
 
 -- file_exists checks if the provided file exists
--- @usage file_exists('~/.config/chnvim/nvim-profile.lua') → true
+-- @usage file_exists('~/.config/cheovim/nvim-profile.lua') → true
 -- @tparam string file The path of the file to check
 -- @return boolean
 M.file_exists = function(file)
@@ -34,7 +34,7 @@ M.file_exists = function(file)
 end
 
 -- read_file reads the content of the provided file
--- @usage read_file('~/.config/chnvim/nvim-profile') → {'doom-nvim'}
+-- @usage read_file('~/.config/cheovim/nvim-profile') → {'doom-nvim'}
 -- @tparam string file The file to read
 -- @return {string...} a table with the file content
 M.read_file = function(file)
@@ -119,7 +119,12 @@ end
 M.unlink = function(path)
 	vim.loop.fs_unlink(path, function(err, success)
 		if err ~= nil then
-			log.error('Failed to remove symlink from ' .. path .. '\nError traceback: ' .. err)
+			log.error(
+				'Failed to remove symlink from '
+					.. path
+					.. '\nError traceback: '
+					.. err
+			)
 		end
 
 		return success
@@ -140,7 +145,10 @@ M.symlink = function(path, new_path, remove_old_symlink, flags)
 					-- If there was an error and the symlink exists, should avoid false errors
 					if err ~= nil and not M.file_exists(new_path) then
 						log.error(
-							'Failed to read symlink from ' .. new_path .. '\nError traceback: ' .. err
+							'Failed to read symlink from '
+								.. new_path
+								.. '\nError traceback: '
+								.. err
 						)
 					end
 

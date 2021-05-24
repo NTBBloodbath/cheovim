@@ -13,37 +13,37 @@
 --       \__\/       \__\/       \__\/         ~~~~               \__\/       --
 --                                                                            --
 --                                                                            --
---                      chnvim - Neovim profile switcher                      --
+--                     cheovim - Neovim profile switcher                      --
 ---]]----------------------------------------------------------------------[[---
 
 local vim = vim
 local filter = vim.tbl_filter
-local utils = require('chnvim.utils')
-local log = require('chnvim.utils.log')
+local utils = require('cheovim.utils')
+local log = require('cheovim.utils.log')
 
 ---- Variables -----------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local chnvim_version = '0.1.0'
+local cheovim_version = '0.1.0'
 local user_home = os.getenv('HOME')
 local config_home =
 	(os.getenv('XDG_CONFIG_HOME') or user_home .. '/.config')
 
-local chnvim_profiles_paths = {
+local cheovim_profiles_paths = {
 	string.format('%s/.nvim_profiles.lua', user_home),
-	string.format('%s/%s', config_home, 'chnvim/profiles.lua'),
+	string.format('%s/%s', config_home, 'cheovim/profiles.lua'),
 }
-local chnvim_default_profile_paths = {
+local cheovim_default_profile_paths = {
 	string.format('%s/.nvim_profile', user_home),
-	string.format('%s/%s', config_home, 'chnvim/profile'),
+	string.format('%s/%s', config_home, 'cheovim/profile'),
 }
 
-local chnvim_profiles_path = utils.head(filter(utils.file_exists, chnvim_profiles_paths))
-	or utils.head(chnvim_profiles_paths)
-local chnvim_default_profile_path = utils.head(filter(utils.file_exists, chnvim_default_profile_paths))
-	or utils.head(chnvim_default_profile_paths)
+local cheovim_profiles_path = utils.head(filter(utils.file_exists, cheovim_profiles_paths))
+	or utils.head(cheovim_profiles_paths)
+local cheovim_default_profile_path = utils.head(filter(utils.file_exists, cheovim_default_profile_paths))
+	or utils.head(cheovim_default_profile_paths)
 
-local chnvim_profile_name = utils.read_file(chnvim_default_profile_path)[1]
+local cheovim_profile_name = utils.read_file(cheovim_default_profile_path)[1]
 	or 'default'
 
 ---- Functions -----------------------------------------------------------------
@@ -54,14 +54,14 @@ local chnvim_profile_name = utils.read_file(chnvim_default_profile_path)[1]
 local function get_profile()
 	local current_profile = {}
 
-	if chnvim_profiles_path == nil then
+	if cheovim_profiles_path == nil then
 		log.error('Cannot find profiles file')
 		return nil
 	else
 		-- Load Profiles table
-		vim.cmd('luafile ' .. chnvim_profiles_path)
+		vim.cmd('luafile ' .. cheovim_profiles_path)
 		for name, path in pairs(Profiles) do
-			if name == chnvim_profile_name then
+			if name == cheovim_profile_name then
 				current_profile = {
 					name = name,
 					path = path,
@@ -74,8 +74,8 @@ local function get_profile()
 	return current_profile
 end
 
-function Chnvim_load_user_init()
-	log.info('Starting version ' .. chnvim_version)
+function Cheovim_load_user_init()
+	log.info('Starting version ' .. cheovim_version)
 	local current_profile = get_profile()
 	local current_profile_path = utils.expand_home(current_profile.path)
 
@@ -87,7 +87,7 @@ function Chnvim_load_user_init()
 	local init_file = utils.head(filter(utils.file_exists, inits))
 		or utils.head(inits)
 
-	-- Check if chnvim should load a Vimscript init or a Lua init
+	-- Check if cheovim should load a Vimscript init or a Lua init
 	local init_type = utils.get_file_extension(init_file)
 
 	-- Symlink configuration Vim directories, e.g. autoload
@@ -130,14 +130,14 @@ function Chnvim_load_user_init()
 	local config_extra_files =
 		utils.get_files(current_profile_path, config_ignore_files)
 	for _, config_file in ipairs(config_extra_files) do
-        -- Don't try to symlink directories
-        if not utils.file_exists(config_file .. '/') then
-            utils.symlink(
-                current_profile_path .. '/' .. config_file,
-                nvim_config_path .. '/' .. config_file,
-                true
-            )
-        end
+		-- Don't try to symlink directories
+		if not utils.file_exists(config_file .. '/') then
+			utils.symlink(
+				current_profile_path .. '/' .. config_file,
+				nvim_config_path .. '/' .. config_file,
+				true
+			)
+		end
 	end
 
 	-- Add lua files to Lua's path if there's a lua directory
@@ -156,6 +156,6 @@ function Chnvim_load_user_init()
 		vim.cmd('source ' .. init_file)
 	end
 
-    log.info('Loaded ' .. chnvim_profile_name .. ' profile')
-    return
+	log.info('Loaded ' .. cheovim_profile_name .. ' profile')
+	return
 end
