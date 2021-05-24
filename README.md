@@ -128,7 +128,9 @@ If this file doesn't exist, then `default` profile will be used, as before.
 
 - [x] Check if the current profile was changed.
 - [x] Stop deleting and creating again the symlinks if the profile haven't changed.
-- [ ] Add a command to use inside Neovim to switch profiles (not live reload, or maybe yes?)
+- [ ] Add a command to use inside Neovim to switch profiles (not live reload, or maybe yes?).
+- [ ] Refact the configurations loading behavior by using `packadd`.
+- [ ] Implement async and lazy-loading, why not?
 
 ## License
 
