@@ -1,6 +1,6 @@
-local log = require('cheovim.utils.log')
-
 local M = {}
+
+local log = require('cheovim.utils.log')
 
 ---- File Utilities -----------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -96,7 +96,6 @@ M.get_files = function(path, ignore_files)
 		if
 			not vim.tbl_contains(ignore_files, file)
 			and (not vim.tbl_contains(ignored_filetypes, M.get_file_extension(file)))
-			and (not M.file_exists(path .. '/' .. file .. '/'))
 		then
 			table.insert(files, file)
 		end
@@ -113,12 +112,31 @@ M.get_file_extension = function(file)
 	return file:match('^.+(%..+)$')
 end
 
+-- readlink is a wrapper for libuv's fs_readlink function
+-- @usage readlink('/path/to/symlink')
+-- @tparam string path The symlink path
+-- @tparam boolean debug If the function should print traceback at errors
+-- @return string or nil
+M.readlink = function(path, debug)
+	local symlink, err = vim.loop.fs_readlink(path)
+
+    if debug and err then
+        log.error(
+            'Failed to read ' .. path .. ' symlink'
+            .. '\nError traceback:'
+            .. err
+        )
+    end
+
+    return symlink
+end
+
 -- unlink is a wrapper for libuv's fs_unlink function
 -- @usage unlink('/path/to/symlink')
 -- @tparam string path The symlink path
 M.unlink = function(path)
 	vim.loop.fs_unlink(path, function(err, success)
-		if err ~= nil then
+		if err then
 			log.error(
 				'Failed to remove symlink from '
 					.. path
@@ -140,22 +158,9 @@ end
 M.symlink = function(path, new_path, remove_old_symlink, flags)
 	if remove_old_symlink then
 		if M.file_exists(new_path) then
-			local prev_link =
-				vim.loop.fs_readlink(new_path, function(err, sym_path)
-					-- If there was an error and the symlink exists, should avoid false errors
-					if err ~= nil and not M.file_exists(new_path) then
-						log.error(
-							'Failed to read symlink from '
-								.. new_path
-								.. '\nError traceback: '
-								.. err
-						)
-					end
+			local prev_link = M.readlink(new_path, false)
 
-					return sym_path
-				end)
-
-			if prev_link ~= nil then
+			if prev_link then
 				M.unlink(new_path)
 			end
 		end
@@ -163,7 +168,7 @@ M.symlink = function(path, new_path, remove_old_symlink, flags)
 
 	if M.file_exists(path) then
 		vim.loop.fs_symlink(path, new_path, flags, function(err, success)
-			if err ~= nil then
+			if err then
 				log.error(
 					'Failed to create symlink from '
 						.. path
@@ -192,25 +197,6 @@ M.head = function(tbl)
 	end
 
 	return tbl[1]
-end
-
--- tail returns all elements but the first in the provided table
--- @usage tail({1,2,3}) → {2,3}
--- @tparam table tbl The table to extract its elements but the first
--- @return table or nil
-M.tail = function(tbl)
-	if vim.tbl_isempty(tbl) then
-		return nil
-	end
-
-	local new_tbl = {}
-	for k, v in pairs(tbl) do
-		if k > 1 then
-			table.insert(new_tbl, v)
-		end
-	end
-
-	return new_tbl
 end
 
 return M
