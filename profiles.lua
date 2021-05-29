@@ -2,9 +2,20 @@
 
 local profiles = {
 
-	my_config = { "/home/vhyrro/.config/nvim.lua" },
-	doom_nvim = { "/home/vhyrro/dev/doom-nvim" },
+	my_config = { "/home/vhyrro/.config/nvim.lua", {
+			url = false,
+			plugins = "packer",
+			preconfigure = "packer:opt",
+		}
+	},
+
+	doom_nvim = { "/home/vhyrro/dev/doom-nvim", {
+			url = false,
+			plugins = "packer",
+			preconfigure = "packer:opt:fix/premature-display-opening",
+		}
+	},
 
 }
 
-return "doom_nvim", profiles
+return "my_config", profiles
