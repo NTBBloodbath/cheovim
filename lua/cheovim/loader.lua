@@ -67,7 +67,17 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			end
 
             -- Print a loading message and pull packer from github with the correct flags
-            vim.cmd("echo \"Pulling packer from github...\"")
+            local loading_messages = {
+                'Brewing up your plugins...',
+                'Linearly interpolating your config...',
+                'Binary searching for a decent config...',
+                'Configuring all the goodies...',
+                'Finding who asked...',
+                'Making sure nothing breaks...'
+            }
+            vim.cmd(
+                string.format("echo \"%s\"", loading_messages[math.random(1, #loading_messages)])
+            )
 			vim.cmd("silent! !git clone https://github.com/wbthomason/packer.nvim -b " .. branch .. " " .. root_plugin_dir .. "/" .. profile_config.plugins .. "/" .. preconfigure_options[2] .. "/packer.nvim")
 		end
 	end
