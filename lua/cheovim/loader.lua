@@ -48,13 +48,40 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 	if profile_config.preconfigure then
 		local preconfigure_options = vim.split(profile_config.preconfigure, ":", true)
 
+		-- Print a unique and epic loading message
+		local loading_messages = {
+			"Brewing up your plugins...",
+			"Linearly interpolating your config...",
+			"Binary searching for a decent config...",
+			"Configuring all the goodies...",
+			"Finding who asked...",
+			"Making sure nothing breaks...",
+			"Loading up your favourite plugin manager...",
+			"Finding reasons why Neovim is the best text editor...",
+			"Laughing at all the emacs users...",
+			"Initializing the plugin manager...",
+			"Finding the next occurrence of a leap second...",
+			"Listing all the reasons why Kyoko is best waifu...",
+			"Telling the population to use Linux...",
+			"Arbitrarily executing code...",
+			"Censoring all the bad reviews...",
+			"Locating Peach's castle...",
+			"Dividing by 0...",
+			"Breaking the 4th wall...",
+			"Just Monika Just Monika Just Monika Just Monika...",
+		}
+
+		math.randomseed(os.time())
+
+		log.info(loading_messages[math.random(#loading_messages)])
+
         -- If we elected to autoconfigure packer
 		if preconfigure_options[1] == "packer" then
 			local branch = "master"
 
             -- Perform option checking
 			if #preconfigure_options < 2 then
-				log.warn("Did not provide enough options for the packer preconfiguration option. Format: packer:{opt|start}. Assuming packer:start...")
+				log.trace("Did not provide enough options for the packer preconfiguration option. Format: packer:{opt|start}. Assuming packer:start...")
 				table.insert(preconfigure_options, "start")
 			elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
 				log.warn("Config option for packer:{opt|start} did not match the allowed values {opt|start}. Assuming packer:start...")
@@ -66,19 +93,9 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 				branch = preconfigure_options[3]
 			end
 
-            -- Print a loading message and pull packer from github with the correct flags
-            local loading_messages = {
-                'Brewing up your plugins...',
-                'Linearly interpolating your config...',
-                'Binary searching for a decent config...',
-                'Configuring all the goodies...',
-                'Finding who asked...',
-                'Making sure nothing breaks...'
-            }
-            vim.cmd(
-                string.format("echo \"%s\"", loading_messages[math.random(1, #loading_messages)])
-            )
 			vim.cmd("silent! !git clone https://github.com/wbthomason/packer.nvim -b " .. branch .. " " .. root_plugin_dir .. "/" .. profile_config.plugins .. "/" .. preconfigure_options[2] .. "/packer.nvim")
+		else
+			log.error(("Unable to preconfigure %s, such a configuration is not available, sorry!"):format(preconfigure_options[1]))
 		end
 	end
 
@@ -93,6 +110,8 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			profile_config.config()
 		end
 	end
+
+	log.info("Successfully loaded new configuration")
 end
 
 function loader.create_plugin_symlink(selected_profile, profiles)
