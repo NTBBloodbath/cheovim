@@ -20,7 +20,7 @@
 
 Neovim configuration switcher written in Lua. Inspired by chemacs.
 
-[Introduction](#introduction) • [Installation](#installation) • [Configuration](#configuration)
+[Introduction](#star2-introduction) • [Installation](#clock4-installation) • [Configuration](#wrench-configuration)
 
 </div>
 
