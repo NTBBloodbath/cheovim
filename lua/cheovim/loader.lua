@@ -46,8 +46,6 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 
     -- If we want to preconfigure some software
 	if profile_config.preconfigure then
-		local preconfigure_options = vim.split(profile_config.preconfigure, ":", true)
-
 		-- Print a unique and epic loading message
 		local loading_messages = {
 			"Brewing up your plugins...",
@@ -71,9 +69,26 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			"Just Monika Just Monika Just Monika Just Monika...",
 		}
 
+		-- Set a pseudorandom seed
 		math.randomseed(os.time())
+		vim.cmd(("echom \"%s\""):format(loading_messages[math.random(#loading_messages)]))
 
-		log.info(loading_messages[math.random(#loading_messages)])
+		-- Cheovim can configure itself for several known configurations, they are defined here
+		local config_matches = {
+			["doom-nvim"] = "packer:opt:fix/premature-display-opening",
+			["lunarvim"] = "packer:start",
+			["vapournvim"] = "packer:start",
+			["nv-ide"] = "packer:start",
+		}
+
+		-- Check whether the user has picked one of the above configs
+		local config_match = config_matches[profile_config.preconfigure:lower()]
+
+		-- If they have then set profile_config.preconfigure to its respective option in the config_matches table
+		profile_config.preconfigure = config_match or profile_config.preconfigure
+
+		-- Split the preconfigure options at every ':'
+		local preconfigure_options = vim.split(profile_config.preconfigure, ":", true)
 
         -- If we elected to autoconfigure packer
 		if preconfigure_options[1] == "packer" then
@@ -81,7 +96,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 
             -- Perform option checking
 			if #preconfigure_options < 2 then
-				log.trace("Did not provide enough options for the packer preconfiguration option. Format: packer:{opt|start}. Assuming packer:start...")
+				log.trace("Did not provide second option for the packer preconfiguration. Assuming packer:start...")
 				table.insert(preconfigure_options, "start")
 			elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
 				log.warn("Config option for packer:{opt|start} did not match the allowed values {opt|start}. Assuming packer:start...")
@@ -93,8 +108,9 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 				branch = preconfigure_options[3]
 			end
 
+			-- Grab packer from GitHub with all the options
 			vim.cmd("silent! !git clone https://github.com/wbthomason/packer.nvim -b " .. branch .. " " .. root_plugin_dir .. "/" .. profile_config.plugins .. "/" .. preconfigure_options[2] .. "/packer.nvim")
-		else
+		else -- We do not know of such a configuration, so print an error
 			log.error(("Unable to preconfigure %s, such a configuration is not available, sorry!"):format(preconfigure_options[1]))
 		end
 	end
@@ -102,7 +118,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
     -- Invoke the profile's init.lua
 	dofile(profiles[selected_profile][1] .. "/init.lua")
 
-    -- If we want to invoke a function after this then do so
+    -- If we want to invoke a command or a lua function then do so (currently does not work)
 	if profile_config.config then
 		if type(profile_config.config) == "string" then
 			vim.cmd(profile_config.config)
@@ -111,6 +127,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 		end
 	end
 
+	-- Issue the success message
 	log.info("Successfully loaded new configuration")
 end
 
