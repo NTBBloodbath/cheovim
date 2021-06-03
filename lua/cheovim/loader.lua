@@ -75,7 +75,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 
 		-- Cheovim can configure itself for several known configurations, they are defined here
 		local config_matches = {
-			["doom-nvim"] = "packer:opt:fix/premature-display-opening",
+			["doom-nvim"] = "packer:opt",
 			["lunarvim"] = "packer:start",
 			["vapournvim"] = "packer:start",
 			["nv-ide"] = "packer:start",
