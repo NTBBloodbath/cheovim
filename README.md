@@ -20,118 +20,119 @@
 
 Neovim configuration switcher written in Lua. Inspired by chemacs.
 
-[Introduction](#introduction) • [Installation](#installation) • [Usage](#usage)
+[Introduction](#introduction) • [Installation](#installation) • [Configuration](#configuration)
 
 </div>
 
 ---
 
-## Introduction
+# :star2: Introduction
+Cheovim is a plugin designed to make your life easier by being able to manage several Neovim
+configurations simultaneously and allow you to fully seamlessly transition between them.
 
-> Cheovim is a Neovim configuration switcher inspired by chemacs. It makes it easy to
-> run multiple Neovim configurations without having headaches.
-> 
-> So, you can think of Cheovim as a bootloader for Neovim.
+By default your configuration is stored under a static `~/.config/nvim` directory. This means if you want to try out
+another chad's configuration you must first move away your configuration into a backup folder, install the other person's config,
+put it in the correct spot, clear your `site/pack` directory so that the plugin manager can work without conflicts,
+install the plugin manager, install the plugins and *then* start using the config. That's absolutely atrocious!
+Afterwards switching back is the exact same awful process. 
 
-Neovim configuration is kept in a `~/.config/nvim` directory and that path is hard-coded.
-If you want to try out someone else's configuration, or run different distributions like
-LunarVim, Doom Nvim or SpaceVim, then you need to swap out `~/.config/nvim` and it can be
-a bit tedious.
+But what if we told you all of that could be fully automated?
 
-Cheovim is made to make your life easier and allow you to change Neovim configurations by
-simply specifying in a file which configurations you want to use!
+# :clock4: Installation
+> :exclamation: Cheovim requires at least Neovim 0.5+ to operate, and may not work on Windows machines!
 
-## Installation
+To install cheovim, make sure to first move your configuration (located under `~/.config/nvim/`) out of the way (into e.g. `~/.config/nvim.bak/`).
+Afterwards be sure to clear everything from `~/.local/share/nvim/site/pack/`, this is the directory where all of your current plugins are installed.
+Cheovim uses symlinks as part of its magic and needs this directory to be clean. Optionally, to make your life easier, remove any files inside your config
+that may autorun on startup and attempt to load plugins (like `plugin/packer_compiled.vim`) - this isn't necessary but you'll see that it makes the initial
+install a bunch easier in some cases.
 
-> **IMPORTANT:** cheovim requires Neovim >= 0.5 to work!
-
-Clone the Cheovim repository as `$HOME/.config/nvim`. Note that if you already have a Neovim
-setup in `~/.config/nvim` you need to move it out of the way first to start using cheovim.
-
+Then we can start the installation!
 ```sh
-# If a neovim config already exists then rename it
-[ -d ~/.config/nvim ] && mv ~/.config/nvim ~/.config/nvim_default
-
-# Clone cheovim repository as the Neovim config
-git clone https://github.com/NTBBloodbath/cheovim.git ~/.config/nvim
+git clone https://github.com/NTBBloodbath/cheovim ~/.config/nvim
 ```
+Will clone cheovim into the config directory. You're almost ready to go! Now we just have to tell cheovim which configs to use:
+Navigate to `~/.config/nvim/` and open the `profiles.lua` file - this is where all the configuration resides.
 
-Next you will need to create a `~/.nvim_profiles.lua` file like this.
-
+This is the default file:
 ```lua
-Profiles = {
-    default = "~/.config/nvim_default",
+--[[
+     /  /\         /__/\         /  /\         /  /\          ___        ___          /__/\    
+    /  /:/         \  \:\       /  /:/_       /  /::\        /__/\      /  /\        |  |::\   
+   /  /:/           \__\:\     /  /:/ /\     /  /:/\:\       \  \:\    /  /:/        |  |:|:\  
+  /  /:/  ___   ___ /  /::\   /  /:/ /:/_   /  /:/  \:\       \  \:\  /__/::\      __|__|:|\:\ 
+ /__/:/  /  /\ /__/\  /:/\:\ /__/:/ /:/ /\ /__/:/ \__\:\  ___  \__\:\ \__\/\:\__  /__/::::| \:\
+ \  \:\ /  /:/ \  \:\/:/__\/ \  \:\/:/ /:/ \  \:\ /  /:/ /__/\ |  |:|    \  \:\/\ \  \:\~~\__\/
+  \  \:\  /:/   \  \::/       \  \::/ /:/   \  \:\  /:/  \  \:\|  |:|     \__\::/  \  \:\      
+   \  \:\/:/     \  \:\        \  \:\/:/     \  \:\/:/    \  \:\__|:|     /__/:/    \  \:\     
+    \  \::/       \  \:\        \  \::/       \  \::/      \__\::::/      \__\/      \  \:\    
+     \__\/         \__\/         \__\/         \__\/           ~~~~                   \__\/    
+
+	A config switcher written in Lua by NTBBloodbath and Vhyrro.
+--]]
+
+-- Defines the profiles you want to use
+local profiles = {
+	--[[
+	Here's an example:
+
+		<name_of_config> = { <path_to_config>, {
+				plugins = "packer", -- Where to install plugins under site/pack
+				preconfigure = "packer:opt" -- Whether or not to preconfigure a plugin manager for you
+			} 
+		}
+
+	More in-depth information can be found in cheovim's README on GitHub.
+	--]]
+	my_config = { "<path>", {
+			plugins = "packer",
+			preconfigure = "packer",
+		}
+	},
 }
+
+-- return <name_of_config>, <list_of_profiles>
+return "my_config", profiles
 ```
 
-> **NOTE:** for more details see [below](#nvim_profileslua).
+You can tweak this file as you see fit, although we recommend reading the next section to actually know what you're doing.
 
-## Usage
-
-Cheovim profiles are configured in `~/.nvim_profiles.lua`.
-
-If a profile is not provided by a `~/.nvim_profile` file, then the `default`
-profile is used.
-
-> **IMPORTANT:** Every time you change the configuration, you must run `PackerSync`
-> _if you use packer_ to update the plugins and move them since not all setups or
-> distributions have the same configuration in their plugins or the same plugins.
-
-### .nvim_profiles.lua
-
-This file contains a Lua table, with the keys being the profile names and the values
-their configuration path.
-
+# :wrench: Configuration
+Cheovim has a fair amount of configuration that may not become apparent right off the bat. Here's the things that you can change:
 ```lua
-Profiles = {
-    default = "~/.config/nvim_default",
-    ["doom-nvim"] = "~/.config/doom-nvim",
+local profiles = {
+	my_config = { "/my/path", {
+			-- url = false, COMING SOON
+			-- config = "PackerSync", COMING SOON
+			plugins = "<plugin_location>",
+			preconfigure = "{packer|paq-nvim}:{start|opt}:<branch> | 
+				doom-nvim | lunarvim | nv-ide | vapournvim",
+		}
+	}
 }
+
+return "my_config", profiles
 ```
 
-Cheovim will symlink all the Vim core directories from that directories (e.g. `autoload/`)
-and source the `init.vim` or `init.lua`.
+### Options
+- `plugins = "<plugin_location>"` - where under `~/.local/share/nvim/site/pack/` to install plugins. Defaults to `"packer"`, meaning plugins
+will be installed under `~/.local/share/nvim/site/pack/packer`.
+By default different plugin managers will install themselves into different directories. Packer installs itself into `packer`,
+paq-nvim installs itself into `paq-nvim`, etc. There may be times where different configs install their plugin managers into
+different directories altogether, so you can change this value accordingly.
+- `preconfigure = "<config>"` - preconfigure a plugin manager before switching configs. Useful for seamless config transitions.
+Options are divided with `:`, but you needn't supply all of them. For example, a value of `packer:opt:fix/premature-display-opening`
+means "preconfigure packer, install it as an opt plugin, and use the `fix/premature-display-opening` branch". Not supplying parts of these parameters
+will use the default values instead, so `packer::fix/premature-display-opening` will be the equivalent of `packer:start:fix/premature-display-opening`,
+`packer:opt` will be the equivalent of `packer:opt:master` and finally `packer` is the equivalent of `packer:start:master`.
+The same principles apply to `paq-nvim`. It is also possible to supply a name of a known configuration and cheovim will set up the plugin manager the way
+that configuration requires it, so e.g. setting `preconfigure` to `"doom-nvim"` will automatically set up packer the way [doom-nvim](https://github.com/NTBBloodbath/doom-nvim)
+likes it. This value can be set to `nil` too to perform no preconfiguration.
 
-> **NOTE:** `nvim_profiles.lua` can also be defined as `profiles.lua` in the `~/.config/cheovim` directory.
+- `return "my_config", profiles` - selects a configuration from a list of profiles. Make sure the first returned value has the same name
+as the key inside the `profiles` table (i.e. if I define a config called `my_config = {}` make sure to return `"my_config"`). Changing this will automatically
+switch configs the next time you launch Neovim.
 
-### Changing the default profile
+Upon launching a new config that hasn't been preconfigured yet you will be greeted with a random message, can you find em' all?
 
-If your `~/.nvim_profiles.lua` file contains the following:
-
-```lua
-Profiles = {
-    default = "~/.config/nvim_default",
-    ["doom-nvim"] = "~/.config/doom-nvim",
-    LunarVim = "~/.config/LunarVim",
-}
-```
-
-You can create a file called `~/.nvim_profile`, containing the name of the profile
-you'd like to be used. For example:
-
-```bash
-$ echo 'doom-nvim' > ~/.nvim_profile
-```
-
-This will set the default profile to be the `doom-nvim` profile, instead of `default`.
-You can change the default by simply changing the contents of this file:
-
-```bash
-$ sed "s/doom-nvim/LunarVim/" ~/.nvim_profile
-```
-
-If this file doesn't exist, then `default` profile will be used, as before.
-
-> **NOTE:** `nvim_profile` can also be defined as `profile` in the `~/.config/cheovim` directory.
-
-## Todo
-
-- [x] Check if the current profile was changed.
-- [x] Stop deleting and creating again the symlinks if the profile haven't changed.
-- [ ] Add a command to use inside Neovim to switch profiles (not live reload, or maybe yes?).
-- [ ] Refact the configurations loading behavior by using `packadd`.
-- [ ] Implement async and lazy-loading, why not?
-
-## License
-
-Cheovim is distributed under the [MIT](./LICENSE) License
+###### Made with love by [NTBBloodbath](https://github.com/NTBBloodbath) and [Vhyrro](https://github.com/vhyrro/) :heart:
