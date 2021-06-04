@@ -69,7 +69,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			"Just Neovim Just Neovim Just Neovim Just Neovim...",
 			"Locating the funny...",
 			"Manipulating the stock market...",
-			"Spamming all r/emacs comments with hAhA I sTiLl hAvE mY PiNKy",
+			"Spamming all r/emacs comments with hAhA I sTiLl hAvE mY PiNKy...",
 		}
 
 		-- Set a pseudorandom seed
