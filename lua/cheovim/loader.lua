@@ -66,7 +66,10 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			"Locating Peach's castle...",
 			"Dividing by 0...",
 			"Breaking the 4th wall...",
-			"Just Monika Just Monika Just Monika Just Monika...",
+			"Just Neovim Just Neovim Just Neovim Just Neovim...",
+			"Locating the funny...",
+			"Manipulating the stock market...",
+			"Spamming all r/emacs comments with hAhA I sTiLl hAvE mY PiNKy",
 		}
 
 		-- Set a pseudorandom seed
@@ -109,7 +112,26 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			end
 
 			-- Grab packer from GitHub with all the options
-			vim.cmd("silent! !git clone https://github.com/wbthomason/packer.nvim -b " .. branch .. " " .. root_plugin_dir .. "/" .. profile_config.plugins .. "/" .. preconfigure_options[2] .. "/packer.nvim")
+			vim.cmd("silent !git clone https://github.com/wbthomason/packer.nvim -b " .. branch .. " " .. root_plugin_dir .. "/" .. profile_config.plugins .. "/" .. preconfigure_options[2] .. "/packer.nvim")
+		elseif preconfigure_options[1] == "paq-nvim" then
+			local branch = "master"
+
+            -- Perform option checking
+			if #preconfigure_options < 2 then
+				log.trace("Did not provide second option for paq's preconfiguration. Assuming paq-nvim:start...")
+				table.insert(preconfigure_options, "start")
+			elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
+				log.warn("Config option for paq-nvim:{opt|start} did not match the allowed values {opt|start}. Assuming paq-nvim:start...")
+				table.insert(preconfigure_options, "start")
+			end
+
+            -- If we have specified a branch then set it
+			if preconfigure_options[3] and preconfigure_options[3]:len() > 0 then
+				branch = preconfigure_options[3]
+			end
+
+			-- Grab packer from GitHub with all the options
+			vim.cmd("silent !git clone https://github.com/savq/paq-nvim -b " .. branch .. " " .. root_plugin_dir .. "/" .. profile_config.plugins .. "/" .. preconfigure_options[2] .. "/paq-nvim")
 		else -- We do not know of such a configuration, so print an error
 			log.error(("Unable to preconfigure %s, such a configuration is not available, sorry!"):format(preconfigure_options[1]))
 		end
@@ -132,6 +154,16 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 end
 
 function loader.create_plugin_symlink(selected_profile, profiles)
+
+	if not profiles[selected_profile] then
+		log.error("Unable to find profile with name", selected_profile)
+		return
+	elseif not profiles[selected_profile][1] then
+		log.error("Unable to load profile with name", selected_profile, "- the first element of the profile must be a path.")
+		return
+	end
+
+	profiles[selected_profile][1] = vim.fn.expand(profiles[selected_profile][1])
 
     -- Set this variable to the site/pack location
 	local root_plugin_dir = vim.fn.stdpath("data") .. "/site/pack"
