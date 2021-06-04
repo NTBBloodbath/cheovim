@@ -39,7 +39,10 @@ Afterwards switching back is the exact same awful process.
 But what if we told you all of that could be fully automated?
 
 # :clock4: Installation
-> :exclamation: Cheovim requires at least Neovim 0.5+ to operate, and may not work on Windows machines!
+> :exclamation: Cheovim requires at least Neovim 0.5+ to operate, and may not work on Windows machines! 
+
+Cheovim only works with configurations that use the new `init.lua` configuration style. If we get enough requests we will
+implement `init.vim` support too, but for now keep up with the times!
 
 To install cheovim, make sure to first move your configuration (located under `~/.config/nvim/`) out of the way (into e.g. `~/.config/nvim.bak/`).
 Afterwards be sure to clear everything from `~/.local/share/nvim/site/pack/`, this is the directory where all of your current plugins are installed.
