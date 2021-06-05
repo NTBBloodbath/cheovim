@@ -154,6 +154,38 @@ configs the next time you launch Neovim.
 
 
 ===============================================================================
+RECIPES                                                       *cheovim-recipes*
+
+- Doom Nvim:
+`doom_nvim = {, "~/.config/doom-nvim", {`
+`        plugins = "packer",`
+`        preconfigure = "doom-nvim"`
+`    }`
+`}`
+
+- LunarVim:
+`lunarvim = {, "~/.config/lunarvim", {`
+`        plugins = "packer",`
+`        preconfigure = "lunarvim"`
+`    }`
+`}`
+
+- VapuorNvim:
+`vapournvim = {, "~/.config/vapournvim", {`
+`        plugins = "packer",`
+`        preconfigure = "vapournvim"`
+`    }`
+`}`
+
+- Nv-ide:
+`nv_ide = {, "~/.config/nv-ide", {`
+`        plugins = "packer",`
+`        preconfigure = "nv-ide"`
+`    }`
+`}`
+
+
+===============================================================================
 LICENSE                                                       *cheovim-license*
 
 cheovim is distributed under GPLv2 License.
