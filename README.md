@@ -138,4 +138,9 @@ switch configs the next time you launch Neovim.
 
 Upon launching a new config that hasn't been preconfigured yet you will be greeted with a random message, can you find em' all?
 
+# TODO
+- [ ] Add support for supplying URLs rather than regular paths to be able to check out different configurations without even needing to clone them yourself
+- [ ] Add the ability to execute a lua function or some vimscript code after switching configs via the config variable (inspired by packer)
+- [ ] Hot reloading of configs whenever a change to the profiles.lua file is detected
+
 ###### Made with love by [NTBBloodbath](https://github.com/NTBBloodbath) and [Vhyrro](https://github.com/vhyrro/) :heart:
