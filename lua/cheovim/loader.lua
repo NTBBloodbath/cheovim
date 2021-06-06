@@ -76,6 +76,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			"Locating the funny...",
 			"Manipulating the stock market...",
 			"Spamming all r/emacs comments with hAhA I sTiLl hAvE mY PiNKy...",
+			"Consooming all the RAM...",
 		}
 
 		-- Set a pseudorandom seed
@@ -150,20 +151,27 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 	log.info("Successfully loaded new configuration")
 end
 
+-- Pulls a config from a URL and returns the path of the stored config
 function loader.handle_url(selected_profile, profiles)
 
+	-- Store the URL in a variable
 	local url = profiles[selected_profile][1]
+	-- Set the install location for remote configurations
 	local cheovim_pulled_config_location = vim.fn._stdpath("data") .. "/cheovim/"
 
+	-- Create the directory if it doesn't already exist
 	vim.loop.fs_mkdir(cheovim_pulled_config_location, 16877)
 
+	-- Check whether we already have a pulled repo in that location
 	local dir, err_message = vim.loop.fs_scandir(cheovim_pulled_config_location .. selected_profile)
 
+	-- If we don't then pull it down!
 	if not dir then
 		log.info("Pulling your config via git...")
 		vim.cmd("!git clone " .. url .. " " .. cheovim_pulled_config_location .. selected_profile)
 	end
 
+	-- Return the path of the installed configuration
 	return cheovim_pulled_config_location .. selected_profile
 
 end
@@ -172,6 +180,7 @@ function loader.create_plugin_symlink(selected_profile, profiles)
 
 	local selected = profiles[selected_profile]
 
+	-- If we haven't selected a valid profile or that profile doesn't come with a path then error out
 	if not selected then
 		log.error("Unable to find profile with name", selected_profile)
 		return
@@ -180,6 +189,7 @@ function loader.create_plugin_symlink(selected_profile, profiles)
 		return
 	end
 
+	-- Set the public variables for use by other files
 	loader.selected_profile = selected_profile
 	loader.profiles = profiles
 
@@ -205,6 +215,7 @@ function loader.create_plugin_symlink(selected_profile, profiles)
 		selected[1] = loader.handle_url(selected_profile, profiles)
 	end
 
+	-- Expand the current path (i.e. convert ~ to the home directory etc.)
 	selected[1] = vim.fn.expand(selected[1])
 
     -- Create the necessary directories if they don't already exist
