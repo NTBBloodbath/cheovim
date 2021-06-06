@@ -25,7 +25,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 
     -- Override all the default values with the user's options
 	local profile_config = vim.tbl_deep_extend("force", default_config, profiles[selected_profile][2])
-	local root_plugin_dir = vim.fn.stdpath("data") .. "/site/pack"
+	local root_plugin_dir = vim.fn._stdpath("data") .. "/site/pack"
 
     -- Delete all symlinks present inside of site/pack
 	for _, symlink in ipairs(vim.fn.glob(root_plugin_dir .. "/*", 0, 1, 1)) do
@@ -38,8 +38,8 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 
     -- Relink the current config's plugin/ directory with a symlinked version
     -- If we don't do this then packer will write its packer_compiled.vim into a location we cannot track
-	vim.loop.fs_unlink(vim.fn.stdpath("config") .. "/plugin")
-	vim.loop.fs_symlink(root_plugin_dir .. "/cheovim/" .. selected_profile .. "/plugin", vim.fn.stdpath("config") .. "/plugin")
+	vim.loop.fs_unlink(vim.fn._stdpath("config") .. "/plugin")
+	vim.loop.fs_symlink(root_plugin_dir .. "/cheovim/" .. selected_profile .. "/plugin", vim.fn._stdpath("config") .. "/plugin")
 
     -- Symlink the plugin install location
 	vim.loop.fs_symlink(root_plugin_dir .. "/cheovim/" .. selected_profile, root_plugin_dir .. "/" .. profile_config.plugins, { dir = true })
@@ -156,7 +156,7 @@ end
 function loader.handle_url(selected_profile, profiles)
 
 	local url = profiles[selected_profile][1]
-	local cheovim_pulled_config_location = vim.fn.stdpath("data") .. "/cheovim/"
+	local cheovim_pulled_config_location = vim.fn._stdpath("data") .. "/cheovim/"
 
 	vim.loop.fs_mkdir(cheovim_pulled_config_location, 16877)
 
@@ -183,11 +183,23 @@ function loader.create_plugin_symlink(selected_profile, profiles)
 		return
 	end
 
+	-- Clone the current stdpath function definition into an unused func
+	vim.fn._stdpath = vim.fn.stdpath
+
+	-- Override vim.fn.stdpath to manipulate the data returned by it. Yes, I know, changing core functions
+	-- is really bad practice in any codebase, however this is our only way to make things like LunarVim etc. work
+	vim.fn.stdpath = function(what)
+		if what:lower() == "config" then
+			return selected[1]
+		end
+		return vim.fn._stdpath(what)
+	end
+
     -- Set this variable to the site/pack location
-	local root_plugin_dir = vim.fn.stdpath("data") .. "/site/pack"
+	local root_plugin_dir = vim.fn._stdpath("data") .. "/site/pack"
 
     -- Unlink the plugins/ directory so packer_compiled.vim doesn't autotrigger
-	vim.loop.fs_unlink(vim.fn.stdpath("config") .. "/plugins")
+	vim.loop.fs_unlink(vim.fn._stdpath("config") .. "/plugins")
 
 	if selected[2] and selected[2].url then
 		selected[1] = loader.handle_url(selected_profile, profiles)
@@ -217,7 +229,7 @@ function loader.create_plugin_symlink(selected_profile, profiles)
 		loader.create_plugin_manager_symlinks(selected_profile, profiles)
 	else -- Else load the config and restore the plugin/ directory
 		dofile(selected[1] .. "/init.lua")
-		vim.loop.fs_symlink(root_plugin_dir .. "/cheovim/" .. selected_profile .. "/plugin", vim.fn.stdpath("config") .. "/plugin")
+		vim.loop.fs_symlink(root_plugin_dir .. "/cheovim/" .. selected_profile .. "/plugin", vim.fn._stdpath("config") .. "/plugin")
 	end
 
 end
