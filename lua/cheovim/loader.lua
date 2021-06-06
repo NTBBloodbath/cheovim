@@ -153,23 +153,47 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 	log.info("Successfully loaded new configuration")
 end
 
+function loader.handle_url(selected_profile, profiles)
+
+	local url = profiles[selected_profile][1]
+	local cheovim_pulled_config_location = vim.fn.stdpath("data") .. "/cheovim/"
+
+	vim.loop.fs_mkdir(cheovim_pulled_config_location, 16877)
+
+	local dir, err_message = vim.loop.fs_scandir(cheovim_pulled_config_location .. selected_profile)
+
+	if not dir then
+		log.info("Pulling your config via git...")
+		vim.cmd("!git clone " .. url .. " " .. cheovim_pulled_config_location .. selected_profile)
+	end
+
+	return cheovim_pulled_config_location .. selected_profile
+
+end
+
 function loader.create_plugin_symlink(selected_profile, profiles)
 
-	if not profiles[selected_profile] then
+	local selected = profiles[selected_profile]
+
+	if not selected then
 		log.error("Unable to find profile with name", selected_profile)
 		return
-	elseif not profiles[selected_profile][1] then
+	elseif not selected[1] then
 		log.error("Unable to load profile with name", selected_profile, "- the first element of the profile must be a path.")
 		return
 	end
-
-	profiles[selected_profile][1] = vim.fn.expand(profiles[selected_profile][1])
 
     -- Set this variable to the site/pack location
 	local root_plugin_dir = vim.fn.stdpath("data") .. "/site/pack"
 
     -- Unlink the plugins/ directory so packer_compiled.vim doesn't autotrigger
 	vim.loop.fs_unlink(vim.fn.stdpath("config") .. "/plugins")
+
+	if selected[2] and selected[2].url then
+		selected[1] = loader.handle_url(selected_profile, profiles)
+	end
+
+	selected[1] = vim.fn.expand(selected[1])
 
     -- Create the necessary directories if they don't already exist
 	vim.loop.fs_mkdir(root_plugin_dir .. "/cheovim/", 16877) -- Permissions: 0775
@@ -185,14 +209,14 @@ function loader.create_plugin_symlink(selected_profile, profiles)
     -- If that symlink does not exist or it differs from the selected config
     -- then update the current configuration and reload everything
 	if not symlink then
-		vim.loop.fs_symlink(profiles[selected_profile][1], start_directory .. "/cheovim", { dir = true })
+		vim.loop.fs_symlink(selected[1], start_directory .. "/cheovim", { dir = true })
 		loader.create_plugin_manager_symlinks(selected_profile, profiles)
-	elseif symlink ~= profiles[selected_profile][1] then
+	elseif symlink ~= selected[1] then
 		vim.loop.fs_unlink(start_directory .. "/cheovim")
-		vim.loop.fs_symlink(profiles[selected_profile][1], start_directory .. "/cheovim", { dir = true })
+		vim.loop.fs_symlink(selected[1], start_directory .. "/cheovim", { dir = true })
 		loader.create_plugin_manager_symlinks(selected_profile, profiles)
 	else -- Else load the config and restore the plugin/ directory
-		dofile(profiles[selected_profile][1] .. "/init.lua")
+		dofile(selected[1] .. "/init.lua")
 		vim.loop.fs_symlink(root_plugin_dir .. "/cheovim/" .. selected_profile .. "/plugin", vim.fn.stdpath("config") .. "/plugin")
 	end
 
