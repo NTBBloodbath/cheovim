@@ -13,4 +13,5 @@ end
 -- Create all the plugins if necessary and start up the rest of cheovim!
 loader.create_plugin_symlink(selected_profile, profiles)
 
+ vim.cmd [[ autocmd VimEnter * ++once :lua require('cheovim.functions').cheovim_config_callback() ]]
 vim.cmd [[ command -nargs=1 -complete=customlist,v:lua.cheovim_autocomplete Cheovim :lua require('cheovim.functions').cheovim_execute_func(<f-args>) ]]
