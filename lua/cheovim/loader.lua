@@ -1,7 +1,12 @@
 -- Loader for neovim configurations
 
 -- Initialize the loader and logger
-local loader, log = {}, require('cheovim.logger')
+local loader, log = {
+
+	selected_profile = nil,
+	profiles = nil,
+
+}, require('cheovim.logger')
 
 function loader.get_profiles(path)
 	-- No pcall or error checking here because we need to be as speedy as possible
@@ -182,6 +187,9 @@ function loader.create_plugin_symlink(selected_profile, profiles)
 		log.error("Unable to load profile with name", selected_profile, "- the first element of the profile must be a path.")
 		return
 	end
+
+	loader.selected_profile = selected_profile
+	loader.profiles = profiles
 
 	-- Clone the current stdpath function definition into an unused func
 	vim.fn._stdpath = vim.fn.stdpath
