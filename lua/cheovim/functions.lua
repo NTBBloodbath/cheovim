@@ -4,7 +4,7 @@ local log = require('cheovim.logger')
 -- @Description Returns a list of potential matches for the currently supplied argument
 function cheovim_autocomplete(_, command)
 	local split_command = vim.split(command, " ")
-	return vim.fn.sort(vim.tbl_filter(function(key) return key:find(split_command[#split_command]) end, { "clean-remote-configs", "force-reload", "reload", "version" }), function(current, next) return current < next end)
+	return vim.fn.sort(vim.tbl_filter(function(key) return key:find(split_command[#split_command]) end, { "clean-plugins", "clean-remote-configs", "force-reload", "reload", "version" }), function(current, next) return current:len() > next:len() end)
 end
 
 return {
@@ -75,6 +75,12 @@ return {
 			else
 				log.info("Cheovim removed no configurations, you're all good!")
 			end
+		elseif arg == "clean-plugins" then
+			-- Unlink the cheovim symlink to trigger a reload on next startup
+			vim.loop.fs_unlink(vim.fn.stdpath("data") .. "/site/pack/cheovim/start/cheovim")
+
+			-- Remove all the current config's plugins
+			vim.cmd("silent! !rm -rf " .. vim.fn.stdpath("data") .. "/site/pack/cheovim/" .. require('cheovim.loader').selected_profile)
 		end
 	end,
 
