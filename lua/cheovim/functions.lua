@@ -21,6 +21,24 @@ return {
 			vim.cmd("silent! !rm -rf " .. vim.fn.stdpath("data") .. "/cheovim/" .. require('cheovim.loader').selected_profile)
 			log.warn("Please restart your editor to commence with the full reload.")
 		end
+	end,
+
+	cheovim_config_callback = function()
+		local loader = require('cheovim.loader')
+
+        if not loader.profile_changed then return end
+
+		local profile_config = loader.profiles[loader.selected_profile][2]
+
+		if profile_config.config then
+			vim.defer_fn(vim.schedule_wrap(function()
+                if type(profile_config.config) == "string" then
+                    vim.cmd(profile_config.config)
+                elseif type(profile_config.config) == "function" then
+                    profile_config.config()
+                end
+            end), 100)
+		end
 	end
 
 }

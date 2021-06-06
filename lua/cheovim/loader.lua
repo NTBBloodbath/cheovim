@@ -5,6 +5,7 @@ local loader, log = {
 
 	selected_profile = nil,
 	profiles = nil,
+    profile_changed = false,
 
 }, require('cheovim.logger')
 
@@ -145,15 +146,6 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
     -- Invoke the profile's init.lua
 	dofile(profiles[selected_profile][1] .. "/init.lua")
 
-    -- If we want to invoke a command or a lua function then do so (currently does not work)
-	if profile_config.config then
-		if type(profile_config.config) == "string" then
-			vim.cmd(profile_config.config)
-		elseif type(profile_config.config) == "function" then
-			profile_config.config()
-		end
-	end
-
 	-- Issue the success message
 	log.info("Successfully loaded new configuration")
 end
@@ -229,9 +221,11 @@ function loader.create_plugin_symlink(selected_profile, profiles)
     -- If that symlink does not exist or it differs from the selected config
     -- then update the current configuration and reload everything
 	if not symlink then
+        loader.profile_changed = true
 		vim.loop.fs_symlink(selected[1], start_directory .. "/cheovim", { dir = true })
 		loader.create_plugin_manager_symlinks(selected_profile, profiles)
 	elseif symlink ~= selected[1] then
+        loader.profile_changed = true
 		vim.loop.fs_unlink(start_directory .. "/cheovim")
 		vim.loop.fs_symlink(selected[1], start_directory .. "/cheovim", { dir = true })
 		loader.create_plugin_manager_symlinks(selected_profile, profiles)
