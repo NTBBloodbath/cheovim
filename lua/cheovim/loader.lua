@@ -89,6 +89,7 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			["lunarvim"] = "packer:start",
 			["vapournvim"] = "packer:start",
 			["nv-ide"] = "packer:start",
+			["lvim"] = "packer:opt",
 		}
 
 		-- Check whether the user has picked one of the above configs
