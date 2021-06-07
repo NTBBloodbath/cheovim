@@ -109,7 +109,7 @@ local profiles = {
 			-- config = "PackerSync", COMING SOON
 			plugins = "<plugin_location>",
 			preconfigure = "{packer|paq-nvim}:{start|opt}:<branch> | 
-				doom-nvim | lunarvim | nv-ide | vapournvim",
+				doom-nvim | lunarvim | nv-ide | vapournvim | lvim",
 		}
 	}
 }
