@@ -18,11 +18,12 @@
 CONTENTS                                                     *cheovim-contents*
     1. Introduction.............................................|cheovim-intro|
     3. Quick start........................................|cheovim-quick-start|
-    4. Configuration....................................|cheovim-configuration|
+    4. Commands..............................................|cheovim-commands|
+    5. Configuration....................................|cheovim-configuration|
         1. Options..............................|cheovim-configuration-options|
-    5. Recipes................................................|cheovim-recipes|
-    6. License................................................|cheovim-license|
-    7. Contributing......................................|cheovim-contributing|
+    6. Recipes................................................|cheovim-recipes|
+    7. License................................................|cheovim-license|
+    8. Contributing......................................|cheovim-contributing|
 
 
 ===============================================================================
@@ -91,6 +92,33 @@ This is the default file:
 `return "my_config", profiles`
 
 See |cheovim-config-options| to know how to configure cheovim.
+
+
+===============================================================================
+COMMANDS                                                     *cheovim-commands*
+
+Cheovim exposes a few commands to make your life easier when using it. Those
+commands allows you to do some tasks like cleaning unused plugins or inclusive
+configurations that you don't have in your `profiles.lua` anymore.
+
+Those commands starts with `:Cheovim` and are the following:
+
+    - `reload`: Reloads the current configuration on next boot.
+
+    - `version`: Shows the Cheovim version.
+
+    - `deep-clean`: cleans all the configuration plugins and then reload it.
+
+    - `force-reload`: reloads the current configuration on next boot and also
+        deletes the current remote config if present (remote configs are those
+        that are pulled down via setting the url option to true) for a
+        completely clean start.
+
+    - `clean-plugins`: will go ahead and remove all the plugins of your
+        current configuration.
+    
+    - `clean-remote-configs`: will go ahead and delete all the remote
+        configurations that aren't defined in your `profiles.lua` file.
 
 
 ===============================================================================
