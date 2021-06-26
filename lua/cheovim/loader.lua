@@ -107,7 +107,6 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 
             -- Perform option checking
 			if #preconfigure_options < 2 then
-				log.trace("Did not provide second option for the packer preconfiguration. Assuming packer:start...")
 				table.insert(preconfigure_options, "start")
 			elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
 				log.warn("Config option for packer:{opt|start} did not match the allowed values {opt|start}. Assuming packer:start...")
@@ -144,6 +143,12 @@ function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 			log.error(("Unable to preconfigure %s, such a configuration is not available, sorry!"):format(preconfigure_options[1]))
 		end
 	end
+
+    if type(profile_config.setup) == "string" then
+        vim.cmd(profile_config.setup)
+    elseif type(profile_config.setup) == "function" then
+        profile_config.setup()
+    end
 
     -- Invoke the profile's init.lua
 	dofile(profiles[selected_profile][1] .. "/init.lua")
