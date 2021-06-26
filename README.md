@@ -150,6 +150,22 @@ switch configs the next time you launch Neovim.
 
 Upon launching a new config that hasn't been preconfigured yet you will be greeted with a random message, can you find em' all?
 
+### The Cheovim Command
+Ohoho, it doesn't stop there. Cheovim also supplies a `:Cheovim` command that you can use to clean up your configs, remove plugins,
+force reload the configuration on next boot, etc. These are the subcommands available:
+
+- `:Cheovim reload` - reloads the current configuration on next boot
+- `:Cheovim version` - prints the current version of cheovim
+- `:Cheovim deep-clean` - cleans all the configuration's plugins, deletes the current remote config
+  if present and force reloads on next boot
+- `:Cheovim force-reload` - reloads the current configuration on next boot and also
+  deletes the current remote config if present (remote configs are those that are pulled down via setting the url option to true)
+  for a completely clean start
+- `:Cheovim clean-plugins` - goes ahead and removes all the plugins from your current configuration
+- `:Cheovim clean-remote-configs` - removes all of the remote configurations that aren't defined in
+  your `profiles.lua` file, therefore removing unused leftover junk configs
+
+
 # TODO
 - [x] Add support for supplying URLs rather than regular paths to be able to check out different configurations without even needing to clone them yourself
 - [x] Add the ability to execute a lua function or some vimscript code after switching configs via the config variable (inspired by packer)
