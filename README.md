@@ -107,8 +107,11 @@ Cheovim has a fair amount of configuration that may not become apparent right of
 ```lua
 local profiles = {
 	my_config = { "/my/path", {
-			-- url = false, COMING SOON
-			-- config = "PackerSync", COMING SOON
+			url = false,
+			setup = function()
+				os.remove("some_important_file")
+			end,
+			config = "PackerSync",
 			plugins = "<plugin_location>",
 			preconfigure = "{packer|paq-nvim}:{start|opt}:<branch> | 
 				doom-nvim | lunarvim | nv-ide | vapournvim | lvim",
@@ -133,6 +136,13 @@ will use the default values instead, so `packer::fix/premature-display-opening` 
 The same principles apply to `paq-nvim`. It is also possible to supply a name of a known configuration and cheovim will set up the plugin manager the way
 that configuration requires it, so e.g. setting `preconfigure` to `"doom-nvim"` will automatically set up packer the way [doom-nvim](https://github.com/NTBBloodbath/doom-nvim)
 likes it. This value can be set to `nil` too to perform no preconfiguration.
+- `url` - tells cheovim whether the supplied URI is actually a link to a repository. If it is, cheovim
+will first grab it from the internet, then it will boot into the configuration. Note that this slightly decreases startup
+time for that configuration in general.
+- `setup` - can be either a function or a string, if it is a string it will get wrapped in a vim.cmd, so be warned.
+Gets invoked before the new configuration gets loaded.
+- `config` - can also be either a function or a string. Gets invoked after the configuration has been fully loaded. Designed
+to also work with asynchronous configurations.
 
 - `return "my_config", profiles` - selects a configuration from a list of profiles. Make sure the first returned value has the same name
 as the key inside the `profiles` table (i.e. if I define a config called `my_config = {}` make sure to return `"my_config"`). Changing this will automatically
