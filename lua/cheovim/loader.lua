@@ -87,9 +87,10 @@ function loader.create_plugin_manager_symlinks(selected_profile, profile_path, p
 		local config_matches = {
 			["doom-nvim"] = "packer:opt",
 			["lunarvim"] = "packer:start",
-			["vapournvim"] = "packer:start",
-			["nv-ide"] = "packer:start",
 			["lvim"] = "packer:opt",
+			["nvchad"] = "packer:opt",
+			["nv-ide"] = "packer:start",
+			["vapournvim"] = "packer:start",
 		}
 
 		-- Check whether the user has picked one of the above configs
