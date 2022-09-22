@@ -114,6 +114,8 @@ log.new = function(config, standalone)
       fp:write(str)
       fp:close()
     end
+
+    return ...
   end
 
   for i, x in ipairs(config.modes) do
@@ -129,6 +131,8 @@ log.new = function(config, standalone)
       end)
     end
   end
+
+  return obj
 end
 
 log.new(default_config, true)
