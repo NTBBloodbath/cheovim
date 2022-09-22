@@ -18,7 +18,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 ![Neovim version](https://img.shields.io/badge/Neovim-0.5-57A143?style=flat-square&logo=neovim)
 
-![Cheovim Showcase GIF](res/cheovim.gif)
+![Cheovim Showcase GIF](https://raw.githubusercontent.com/NTBBloodbath/cheovim/assets/res/cheovim.gif)
 
 Neovim configuration switcher written in Lua. Inspired by chemacs.
 
