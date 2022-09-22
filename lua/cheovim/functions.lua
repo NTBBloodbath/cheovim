@@ -1,10 +1,17 @@
-local log = require('cheovim.logger')
+local log = require("cheovim.logger")
 
 -- @Summary An autocompletion function for the :Cheovim command
 -- @Description Returns a list of potential matches for the currently supplied argument
 function cheovim_autocomplete(_, command)
 	local split_command = vim.split(command, " ")
-	return vim.fn.sort(vim.tbl_filter(function(key) return key:find(split_command[#split_command]) end, { "clean-plugins", "clean-remote-configs", "deep-clean", "force-reload", "reload", "version" }), function(current, next) return current:len() > next:len() end)
+	return vim.fn.sort(
+		vim.tbl_filter(function(key)
+			return key:find(split_command[#split_command])
+		end, { "clean-plugins", "clean-remote-configs", "deep-clean", "force-reload", "reload", "version" }),
+		function(current, next)
+			return current:len() > next:len()
+		end
+	)
 end
 
 return {
@@ -28,7 +35,12 @@ return {
 			vim.loop.fs_unlink(vim.fn.stdpath("data") .. "/site/pack/cheovim/start/cheovim")
 
 			-- Remove the remotely installed configuration if present
-			vim.cmd("silent! !rm -rf " .. vim.fn.stdpath("data") .. "/cheovim/" .. require('cheovim.loader').selected_profile)
+			vim.cmd(
+				"silent! !rm -rf "
+					.. vim.fn.stdpath("data")
+					.. "/cheovim/"
+					.. require("cheovim.loader").selected_profile
+			)
 
 			log.warn("Please restart your editor to commence with the full reload.")
 		elseif arg == "clean-remote-configs" then -- If we would like to clean unused remote configurations then
@@ -44,7 +56,7 @@ return {
 
 			-- Get all of the configurations currently defined in the profiles.lua file
 			local present_configs = (function()
-				local profiles = require('cheovim.loader').profiles
+				local profiles = require("cheovim.loader").profiles
 				local result = {}
 
 				for name, profile in pairs(profiles) do
@@ -80,14 +92,19 @@ return {
 			vim.loop.fs_unlink(vim.fn.stdpath("data") .. "/site/pack/cheovim/start/cheovim")
 
 			-- Remove all the current config's plugins
-			vim.cmd("silent! !rm -rf " .. vim.fn.stdpath("data") .. "/site/pack/cheovim/" .. require('cheovim.loader').selected_profile)
+			vim.cmd(
+				"silent! !rm -rf "
+					.. vim.fn.stdpath("data")
+					.. "/site/pack/cheovim/"
+					.. require("cheovim.loader").selected_profile
+			)
 
 			log.info("Cleaned all the current configuration's plugins!")
 		elseif arg == "deep-clean" then
-			vim.cmd [[
+			vim.cmd([[
 				Cheovim clean-plugins
 				Cheovim force-reload
-			]]
+			]])
 		end
 	end,
 
@@ -95,10 +112,12 @@ return {
 	-- @Description Triggered whenever a configuration is switched and whenever the user has set the `config` option
 	cheovim_config_callback = function()
 		-- Require the cheovim loader
-		local loader = require('cheovim.loader')
+		local loader = require("cheovim.loader")
 
 		-- If our profile hasn't changed since last load then don't trigger
-        if not loader.profile_changed then return end
+		if not loader.profile_changed then
+			return
+		end
 
 		-- Grab the configuration for our current profile
 		local profile_config = loader.profiles[loader.selected_profile][2]
@@ -106,14 +125,16 @@ return {
 		-- If we have defined a config variable then
 		if profile_config.config then
 			-- Depending on the type of the config variable execute the code in a different way
-			vim.defer_fn(vim.schedule_wrap(function()
-                if type(profile_config.config) == "string" then
-                    vim.cmd(profile_config.config)
-                elseif type(profile_config.config) == "function" then
-                    profile_config.config()
-                end
-            end), 100) -- We defer for 100ms here to be absolutely sure the config has loaded
+			vim.defer_fn(
+				vim.schedule_wrap(function()
+					if type(profile_config.config) == "string" then
+						vim.cmd(profile_config.config)
+					elseif type(profile_config.config) == "function" then
+						profile_config.config()
+					end
+				end),
+				100
+			) -- We defer for 100ms here to be absolutely sure the config has loaded
 		end
 	end,
-
 }
