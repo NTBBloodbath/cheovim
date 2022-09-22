@@ -1,39 +1,40 @@
--- log.lua
+-- logger.lua
 --
 -- Inspired by rxi/log.lua
 -- Modified by tjdevries and can be found at github.com/tjdevries/vlog.nvim
+-- Modified _again_ by NTBBloodbath
 --
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the MIT license. See LICENSE for details.
 
 -- User configuration section
 local default_config = {
-	-- Name of the plugin. Prepended to log messages
-	plugin = "CHEOVIM-v0.2",
+	-- Name of the plugin. Prepended to log messages.
+	plugin = "CHEOVIM-v0.3",
 
-	-- Should print the output to neovim while running
+	-- Should print the output to neovim while running.
 	use_console = true,
 
-	-- Should highlighting be used in console (using echohl)
+	-- Should highlighting be used in console, see ':h vim.log.levels'.
 	highlights = true,
 
-	-- Should write to a file
+	-- Should write to a file.
 	use_file = true,
 
 	-- Any messages above this level will be logged.
-	level = "trace",
+	level = "info",
 
-	-- Level configuration
+	-- Level configuration.
 	modes = {
-		{ name = "trace", hl = "Comment" },
-		{ name = "debug", hl = "Comment" },
-		{ name = "info", hl = "None" },
-		{ name = "warn", hl = "WarningMsg" },
-		{ name = "error", hl = "ErrorMsg" },
-		{ name = "fatal", hl = "ErrorMsg" },
+		{ name = "trace", hl = vim.log.levels.TRACE },
+		{ name = "debug", hl = vim.log.levels.DEBUG },
+		{ name = "info", hl = vim.log.levels.INFO },
+		{ name = "warn", hl = vim.log.levels.WARN },
+		{ name = "error", hl = vim.log.levels.ERROR },
+		{ name = "fatal", hl = vim.log.levels.ERROR },
 	},
 
-	-- Can limit the number of decimals displayed for floats
+	-- Can limit the number of decimals displayed for floats.
 	float_precision = 0.01,
 }
 
@@ -87,17 +88,13 @@ log.new = function(config, standalone)
 		local console_lineinfo = vim.fn.fnamemodify(info.short_src, ":t") .. ":" .. info.currentline
 		local console_string = string.format("[%-6s%s] %s: %s", nameupper, os.date("%H:%M:%S"), console_lineinfo, msg)
 
-		if config.highlights and level_config.hl then
-			vim.cmd(string.format("echohl %s", level_config.hl))
-		end
-
 		local split_console = vim.split(console_string, "\n")
 		for _, v in ipairs(split_console) do
-			vim.cmd(string.format([[echom "[%s] %s"]], config.plugin, vim.fn.escape(v, '"')))
-		end
-
-		if config.highlights and level_config.hl then
-			vim.cmd("echohl NONE")
+			if config.highlights and level_config.hl then
+  			vim.notify(string.format("[%s] %s", config.plugin, vim.fn.escape(v, '"')), level_config.hl)
+  		else
+  			vim.notify(string.format("[%s] %s", config.plugin, vim.fn.escape(v, '"')))
+  		end
 		end
 	end)
 
