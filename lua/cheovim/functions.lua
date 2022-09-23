@@ -112,9 +112,9 @@ return {
 				-- If it is not present in the list of configs we have specified then remove it
 				if not vim.tbl_contains(present_configs, config) then
 					vim.notify(
-						"[Cheovim v0.3] Unused configuration",
-						config,
-						"detected, removing...",
+						"[Cheovim v0.3] Unused configuration "
+    						.. config
+    						.. " detected, removing...",
 						vim.log.levels.INFO
 					)
 					vim.cmd("silent! !rm -rf " .. vim.fn.stdpath("data") .. "/cheovim/" .. config)
@@ -125,9 +125,9 @@ return {
 			-- Issue the finish message
 			if removed_config_count > 0 then
 				vim.notify(
-					"[Cheovim v0.3] Cheovim removed",
-					removed_config_count,
-					"configurations.",
+					"[Cheovim v0.3] Cheovim removed "
+    					.. removed_config_count
+	    				.. " configurations.",
 					vim.log.levels.INFO
 				)
 			else
