@@ -22,7 +22,6 @@ end
 function loader.create_plugin_manager_symlinks(selected_profile, profiles)
 	-- Construct a default configuration
 	local default_config = {
-		url = false,
 		plugins = "packer",
 		preconfigure = nil,
 	}
@@ -247,7 +246,7 @@ function loader.create_plugin_symlink(selected_profile, profiles)
 	-- Unlink the plugins/ directory so packer_compiled.vim doesn't autotrigger
 	vim.loop.fs_unlink(vim.fn._stdpath("config") .. "/plugin")
 
-	if selected[2] and selected[2].url then
+	if string.find(selected[1],'https://') ~= nil then
 		selected[1] = loader.handle_url(selected_profile, profiles)
 	end
 
