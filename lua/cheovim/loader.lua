@@ -298,7 +298,7 @@ function loader.handle_url(selected_profile, profiles)
 
 	-- Early return if config already exists, we want to be speedy as possible
 	if vim.fn.isdirectory(cheovim_pulled_config_location .. selected_profile) == 1 then
-	    return
+		return
 	end
 
 	-- Create the directory if it doesn't already exist
@@ -367,40 +367,40 @@ function loader.create_plugin_symlink()
 	if string.find(selected[1], "https://") ~= nil then
 		selected[1] = loader.handle_url(selected_profile, profiles)
 	else
-	    -- Expand the current path (i.e. convert ~ to the home directory etc.)
-	    -- NOTE: we do not expand it if configuration path is an URL as handle_url already expands it
-	    selected[1] = vim.fn.expand(selected[1])
+		-- Expand the current path (i.e. convert ~ to the home directory etc.)
+		-- NOTE: we do not expand it if configuration path is an URL as handle_url already expands it
+		selected[1] = vim.fn.expand(selected[1])
 	end
 
 	-- Unlink the plugin/ directory so packer_compiled.{vim,lua} doesn't autotrigger
 	if vim.fn.isdirectory(vim.fn._stdpath("config") .. "/plugin") == 1 then
-	    vim.loop.fs_unlink(vim.fn._stdpath("config") .. "/plugin", function(err, _)
-		    if err then
-			    vim.notify(
-				    "[Cheovim v0.3] Failed to unlink the Cheovim symlink at " .. vim.fn._stdpath("config") .. "/plugin",
-				    vim.log.levels.ERROR
-			    )
-		    end
-	    end)
+		vim.loop.fs_unlink(vim.fn._stdpath("config") .. "/plugin", function(err, _)
+			if err then
+				vim.notify(
+					"[Cheovim v0.3] Failed to unlink the Cheovim symlink at " .. vim.fn._stdpath("config") .. "/plugin",
+					vim.log.levels.ERROR
+				)
+			end
+		end)
 	end
 
 	-- Load the config and restore the plugin/ directory
 	loader.create_plugin_manager_symlinks()
 	dofile(selected[1] .. "/init.lua")
 	if vim.fn.isdirectory(vim.fn.stdpath("config") .. "/plugin") == 1 then
-	    vim.loop.fs_symlink(
-		    vim.fn.stdpath("config") .. "/plugin",
-		    vim.fn._stdpath("config") .. "/plugin",
-		    { dir = true },
-		    function(err, _)
-			    if err then
-				    vim.notify(
-					    "[Cheovim v0.3] Failed to create symlink for " .. vim.fn.stdpath("config") .. "/plugin",
-					    vim.log.levels.ERROR
-				    )
-			    end
-		    end
-	    )
+		vim.loop.fs_symlink(
+			vim.fn.stdpath("config") .. "/plugin",
+			vim.fn._stdpath("config") .. "/plugin",
+			{ dir = true },
+			function(err, _)
+				if err then
+					vim.notify(
+						"[Cheovim v0.3] Failed to create symlink for " .. vim.fn.stdpath("config") .. "/plugin",
+						vim.log.levels.ERROR
+					)
+				end
+			end
+		)
 	end
 end
 
