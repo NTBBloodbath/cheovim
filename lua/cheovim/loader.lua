@@ -163,6 +163,33 @@ function loader.create_plugin_manager_symlinks()
 		-- Split the preconfigure options at every ':'
 		local preconfigure_options = vim.split(profile_config.preconfigure, ":", true)
 
+		-- Perform option checking
+		if preconfigure_options[1] == "packer" then
+			if #preconfigure_options < 2 then
+				table.insert(preconfigure_options, "start")
+			elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
+				vim.notify(
+					"[Cheovim v0.3] Config option for packer:{opt|start} did not match the allowed values {opt|start}. Assuming packer:start...",
+					vim.log.levels.WARN
+				)
+				table.insert(preconfigure_options, "start")
+			end
+		elseif preconfigure_options[1] == "paq-nvim" then
+			if #preconfigure_options < 2 then
+				vim.notify(
+					"[Cheovim v0.3] Did not provide second option for paq's preconfiguration. Assuming paq-nvim:start...",
+					vim.log.levels.TRACE
+				)
+				table.insert(preconfigure_options, "start")
+			elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
+				vim.notify(
+					"[Cheovim v0.3] Config option for paq-nvim:{opt|start} did not match the allowed values {opt|start}. Assuming paq-nvim:start...",
+					vim.log.levels.WARN
+				)
+				table.insert(preconfigure_options, "start")
+			end
+		end
+
 		local install_path = root_plugin_dir
 			.. "/"
 			.. profile_config.plugins
@@ -171,29 +198,13 @@ function loader.create_plugin_manager_symlinks()
 			.. "/"
 			.. (preconfigure_options[1] == "packer" and "packer.nvim" or "paq-nvim")
 
-		local install_dir, _ = vim.loop.fs_scandir(install_path, function(err, data)
-			if not err then
-				return data
-			end
-			return nil
-		end)
+		local install_dir = vim.loop.fs_scandir(install_path)
 
 		-- Install plugin manager only if needed
 		if not install_dir then
 			-- If we elected to autoconfigure packer
 			if preconfigure_options[1] == "packer" then
 				local branch = "master"
-
-				-- Perform option checking
-				if #preconfigure_options < 2 then
-					table.insert(preconfigure_options, "start")
-				elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
-					vim.notify(
-						"[Cheovim v0.3] Config option for packer:{opt|start} did not match the allowed values {opt|start}. Assuming packer:start...",
-						vim.log.levels.WARN
-					)
-					table.insert(preconfigure_options, "start")
-				end
 
 				-- If we have specified a branch then set it
 				if preconfigure_options[3] and preconfigure_options[3]:len() > 0 then
@@ -222,21 +233,6 @@ function loader.create_plugin_manager_symlinks()
 				end
 			elseif preconfigure_options[1] == "paq-nvim" then
 				local branch = "master"
-
-				-- Perform option checking
-				if #preconfigure_options < 2 then
-					vim.notify(
-						"[Cheovim v0.3] Did not provide second option for paq's preconfiguration. Assuming paq-nvim:start...",
-						vim.log.levels.TRACE
-					)
-					table.insert(preconfigure_options, "start")
-				elseif preconfigure_options[2] ~= "start" and preconfigure_options[2] ~= "opt" then
-					vim.notify(
-						"[Cheovim v0.3] Config option for paq-nvim:{opt|start} did not match the allowed values {opt|start}. Assuming paq-nvim:start...",
-						vim.log.levels.WARN
-					)
-					table.insert(preconfigure_options, "start")
-				end
 
 				-- If we have specified a branch then set it
 				if preconfigure_options[3] and preconfigure_options[3]:len() > 0 then
@@ -273,7 +269,6 @@ function loader.create_plugin_manager_symlinks()
 				)
 			end
 		end
-		install_dir:closedir()
 	end
 
 	if type(profile_config.setup) == "string" then
