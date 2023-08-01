@@ -1,4 +1,5 @@
 -- Initialize the loader
+require("cheovim.functions")
 local loader = require("cheovim.loader")
 
 -- Grab the selected profiles from the profiles file
